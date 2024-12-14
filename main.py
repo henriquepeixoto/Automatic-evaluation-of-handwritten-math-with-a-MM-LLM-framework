@@ -13,6 +13,7 @@ import torch
 
 # OpenAI API
 from openai import OpenAI
+import openai
 
 # Image processing and display
 from PIL import Image, ImageDraw
@@ -29,7 +30,10 @@ import numpy as np
 from io import BytesIO
 import re
 import sys
+from io import BytesIO
+
 sys.path.append('Automatic-evaluation-of-handwritten-math-with-a-MM-LLM-framework') # Add the path to the cloned repo
+
 from preprocess import Preprocess
 from posprocess import Posprocess
 
@@ -62,7 +66,7 @@ class LLM_math_evaluator:
     elif model_name in ["gpt-4o-mini", "gpt-4o"]:
         os.environ["OPENAI_API_KEY"] = key
         self.model_openai = model_name
-        self.client_openai = OpenAI(api_key=key)
+        # self.client_openai = OpenAI(api_key=key)
     else:
         raise ValueError(f"Model {model_name} not supported, supported models are gemini-1.5-pro, llama-3.2-11b, gpt-4o-mini and gpt-4o")
 
@@ -133,40 +137,50 @@ class LLM_math_evaluator:
     return SYSTEM_INSTRUCTIONS_1, SYSTEM_INSTRUCTIONS_2
 
 
-  def openAI_inference(self, question, solution, answer, image_path, model, print_img=False):
+  def openAI_inference(self, question, solution, answer, image_path, print_img=False):
     img = self.preprocessor.img_preprocess(img_path=image_path, resize=True, max_width=500, max_height=500)
     base64_image = self.preprocessor.encode_image(img)
 
     input1 = f"""
     Question: {question}
     Teacher's correct answer (LaTeX): {answer}
+    Image:
     """
     input2 = f"""
     Question: {question}
     Teacher's correct solution (LaTeX): {solution}
+    Image:
     """
 
     # Create the payload for the OpenAI API
-    messages_payload_1 = [
-        {"role": "system", "content": self.SYSTEM_INSTRUCTIONS_1},
-        {"role": "user", "content": input1},
-        {"role": "user", "content": f"data:image/png;base64,{base64_image}"}
+    messages_payload_1 =     [
+    {"role": "system", "content":self.SYSTEM_INSTRUCTIONS_1},
+    {
+      "role": "user",
+      "content": input1,
+      "name": "image",
+      "attachment": base64_image  
+    }
     ]
+
 
     messages_payload_2 = [
-        {"role": "system", "content": self.SYSTEM_INSTRUCTIONS_2},
-        {"role": "user", "content": input2},
-        {"role": "user", "content": f"data:image/png;base64,{base64_image}"}
+    {"role": "system", "content":self.SYSTEM_INSTRUCTIONS_2},
+    {
+      "role": "user",
+      "content": input2,
+      "name": "image",
+      "attachment": base64_image  
+    }
     ]
-
     # Send the request to OpenAI
-    response_1 = self.client_openai.chat.completions.create(
+    response_1 = openai.chat.completions.create(
         model=self.model_openai,
         messages=messages_payload_1,
         temperature=0.0,
     )
 
-    response_2 = self.client_openai.chat.completions.create(
+    response_2 =  openai.chat.completions.create(
         model=self.model_openai,
         messages=messages_payload_2,
         temperature=0.0,
