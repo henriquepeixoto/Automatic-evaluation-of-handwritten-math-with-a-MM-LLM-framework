@@ -29,8 +29,9 @@ import numpy as np
 from io import BytesIO
 import re
 import sys
-sys.path.append('/content/drive/MyDrive/Mestrado UFABC/Projeto final - Notebooks/')
 from preprocess import Preprocess
+from posprocess import Posprocess
+
 
 class LLM_math_evaluator:
   def __init__(self, model_name, key, verbose=False):
