@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 
 # Encoding/Decoding
 import base64
+from io import BytesIO
 
 class Preprocess:
     def __init__(self, verbose=False):

@@ -30,7 +30,6 @@ import numpy as np
 from io import BytesIO
 import re
 import sys
-from io import BytesIO
 
 sys.path.append('Automatic-evaluation-of-handwritten-math-with-a-MM-LLM-framework') # Add the path to the cloned repo
 
