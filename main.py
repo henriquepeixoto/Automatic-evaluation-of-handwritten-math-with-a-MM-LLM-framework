@@ -32,7 +32,6 @@ import sys
 from preprocess import Preprocess
 from posprocess import Posprocess
 
-
 class LLM_math_evaluator:
   def __init__(self, model_name, key, verbose=False):
 
